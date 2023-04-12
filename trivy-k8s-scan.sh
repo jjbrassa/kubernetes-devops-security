@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# TODO : Need to be able to login to docker to get to image!!!
 
 echo $imageName #getting Image name from env variable
 
