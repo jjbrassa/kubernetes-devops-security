@@ -13,6 +13,10 @@ pipeline {
   }
 
   stages {
+
+      // ---------------------------------
+      // Build the artifact
+      // ---------------------------------
       stage('Build Artifact - Maven') {
             steps {
               sh "mvn clean package -DskipTests=true"
@@ -20,11 +24,16 @@ pipeline {
             }
       }
 
+      // ---------------------------------
+      // Run the unit test suite
+      // ---------------------------------
       stage('Unit Tests - Junit and JaCoco') {
         steps {
           sh "mvn test"
         }
       }
+  }
+}
 
       // stage('Mutation Tests - PIT') {
       //   steps {
@@ -142,12 +151,12 @@ pipeline {
     //   always {
     //     junit 'target/surefire-reports/*.xml'
     //     jacoco execPattern: 'target/jacoco.exec'
-    //     //pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
-    //     //dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-    //     //publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report', useWrapperFileDirectly: true])
-    //     //sendNotification currentBuild.result
+    //     pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+    //     dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+    //     publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report', useWrapperFileDirectly: true])
+    //     sendNotification currentBuild.result
     //   }
-    // }
+
 
     // success {
 
@@ -156,4 +165,3 @@ pipeline {
     // failure {
 
     // }
-}
