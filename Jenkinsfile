@@ -55,6 +55,26 @@ pipeline {
         }
       }
 
+      // ---------------------------------
+      // k8s Build - Dev env
+      // ---------------------------------
+      stage('K8S Deployment - DEV') {
+        steps {
+          parallel(
+            "Deployment": {
+              withKubeConfig([credentialsId: 'kubeconfig']) {
+                sh "bash k8s-deployment.sh"
+              }
+            },
+            "Rollout Status": {
+              withKubeConfig([credentialsId: 'kubeconfig']) {
+                sh "bash k8s-deployment-rollout-status.sh"
+              }
+            }
+          )
+        }
+      }
+
   }
   // ---------------------------------
   // Move all the report output!
@@ -112,23 +132,6 @@ pipeline {
       //       //"Trivy Scan": {
       //       //  sh "bash trivy-k8s-scan.sh"
       //       //}
-      //     )
-      //   }
-      // }
-
-      // stage('K8S Deployment - DEV') {
-      //   steps {
-      //     parallel(
-      //       "Deployment": {
-      //         withKubeConfig([credentialsId: 'kubeconfig']) {
-      //           sh "bash k8s-deployment.sh"
-      //         }
-      //       },
-      //       "Rollout Status": {
-      //         withKubeConfig([credentialsId: 'kubeconfig']) {
-      //           sh "bash k8s-deployment-rollout-status.sh"
-      //         }
-      //       }
       //     )
       //   }
       // }
