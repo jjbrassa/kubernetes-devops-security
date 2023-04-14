@@ -43,6 +43,22 @@ pipeline {
       }
       
       // ---------------------------------
+      // SAST Tests with SonarCube
+      // ---------------------------------
+      stage('SonarQube - SAST') {
+        steps {
+          withSonarQubeEnv('SonarQube') {
+            sh "mvn sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.host.url=http://ec2-52-9-90-238.us-west-1.compute.amazonaws.com:9000 -Dsonar.login=sqp_1776796ba12df2e9d4471f653a227aeaa50aa269"
+        }
+          timeout(time: 2, unit: 'MINUTES') {
+            script {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+      
+      // ---------------------------------
       // Docker build!
       // ---------------------------------
        stage('Docker Build and Push') {
@@ -90,20 +106,6 @@ pipeline {
     }
   }
 }
-
-      // stage('SonarQube - SAST') {
-      //   steps {
-      //     withSonarQubeEnv('SonarQube') {
-      //       sh "mvn sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.host.url=http://ec2-52-9-90-238.us-west-1.compute.amazonaws.com:9000 -Dsonar.login=e539c70b754e4422a5a29817685bc306285d9520"
-      //   }
-      //     timeout(time: 2, unit: 'MINUTES') {
-      //       script {
-      //         waitForQualityGate abortPipeline: true
-      //       }
-      //     }
-      //   }
-      // }
-
       // stage('Vulnerability Scan - Docker') {
       //   steps {
       //     parallel(
