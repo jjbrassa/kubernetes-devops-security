@@ -32,14 +32,27 @@ pipeline {
           sh "mvn test"
         }
       }
+
+      stage('Mutation Tests - PIT') {
+        steps {
+          sh "mvn org.pitest:pitest-maven:mutationCoverage"
+        }
+      }
+
+      // ---------------------------------
+      // Move all the report output!
+      // ---------------------------------
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+          jacoco execPattern: 'target/jacoco.exec'
+          pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+          dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+          publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report', useWrapperFileDirectly: true])
+          sendNotification currentBuild.result
+        }
   }
 }
-
-      // stage('Mutation Tests - PIT') {
-      //   steps {
-      //     sh "mvn org.pitest:pitest-maven:mutationCoverage"
-      //   }
-      // }
 
       // stage('SonarQube - SAST') {
       //   steps {
@@ -146,16 +159,6 @@ pipeline {
     //     }
     //   }
     // }
-
-    // post {
-    //   always {
-    //     junit 'target/surefire-reports/*.xml'
-    //     jacoco execPattern: 'target/jacoco.exec'
-    //     pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
-    //     dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-    //     publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report', useWrapperFileDirectly: true])
-    //     sendNotification currentBuild.result
-    //   }
 
 
     // success {
