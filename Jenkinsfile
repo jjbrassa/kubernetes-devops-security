@@ -47,14 +47,7 @@ pipeline {
       // ---------------------------------
       stage('SonarQube - SAST') {
         steps {
-          withSonarQubeEnv('SonarQube') {
-            sh "mvn sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.host.url=http://ec2-52-9-90-238.us-west-1.compute.amazonaws.com:9000 -Dsonar.login=sqp_1776796ba12df2e9d4471f653a227aeaa50aa269"
-        }
-          timeout(time: 2, unit: 'MINUTES') {
-            script {
-              waitForQualityGate abortPipeline: true
-            }
-          }
+          sh "mvn clean verify sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.projectName='numeric-application' -Dsonar.host.url=http://ec2-52-9-90-238.us-west-1.compute.amazonaws.com:9000 -Dsonar.token=sqp_40641e5e4fc22039759549b02ce5505c6558a61b"
         }
       }
       
