@@ -41,6 +41,20 @@ pipeline {
           sh "mvn org.pitest:pitest-maven:mutationCoverage"
         }
       }
+      
+      // ---------------------------------
+      // Docker build!
+      // ---------------------------------
+       stage('Docker Build and Push') {
+        steps {
+          withDockerRegistry([credentialsId: "docker-hub", url: ""]) {
+            sh 'printenv'
+            sh 'sudo docker build -t jjbrassa/numeric-app:""$GIT_COMMIT"" .'
+            sh 'docker push jjbrassa/numeric-app:""$GIT_COMMIT""'
+          }
+        }
+      }
+
   }
   // ---------------------------------
   // Move all the report output!
@@ -83,16 +97,6 @@ pipeline {
       //         sh 'docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile'
       //       }
       //     )
-      //   }
-      // }
-
-      // stage('Docker Build and Push') {
-      //   steps {
-      //     withDockerRegistry([credentialsId: "docker-hub", url: ""]) {
-      //       sh 'printenv'
-      //       sh 'sudo docker build -t jjbrassa/numeric-app:""$GIT_COMMIT"" .'
-      //       sh 'docker push jjbrassa/numeric-app:""$GIT_COMMIT""'
-      //     }
       //   }
       // }
 
