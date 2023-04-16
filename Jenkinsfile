@@ -102,9 +102,9 @@ pipeline {
       }
 
   }
-  ---------------------------------
-  Move all the report output!
-  ---------------------------------
+  //---------------------------------
+  //Move all the report output!
+  //---------------------------------
   post {
     always {
       junit 'target/surefire-reports/*.xml'
