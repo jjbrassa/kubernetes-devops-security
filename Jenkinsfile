@@ -47,7 +47,14 @@ pipeline {
       // ---------------------------------
       stage('SonarQube - SAST') {
         steps {
-          sh "mvn clean verify sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.projectName='numeric-application' -Dsonar.host.url=http://ec2-52-9-90-238.us-west-1.compute.amazonaws.com:9000 -Dsonar.token=sqp_40641e5e4fc22039759549b02ce5505c6558a61b"
+           withSonarQubeEnv('SonarQube') {
+              sh "mvn clean verify sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.projectName='numeric-application' -Dsonar.host.url=http://ec2-52-9-90-238.us-west-1.compute.amazonaws.com:9000 -Dsonar.token=sqp_40641e5e4fc22039759549b02ce5505c6558a61b"
+           }
+           timeout(time: 2, unit: 'MINUTES') {
+            script {
+              waitForQualityGate abortPipeline: true
+            }
+        }
         }
       }
       
@@ -90,9 +97,9 @@ pipeline {
   // ---------------------------------
   post {
     always {
-      junit 'target/surefire-reports/*.xml'
-      jacoco execPattern: 'target/jacoco.exec'
-      pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+      //junit 'target/surefire-reports/*.xml'
+      //jacoco execPattern: 'target/jacoco.exec'
+      //pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
       //dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
       //publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report', useWrapperFileDirectly: true])
       //sendNotification currentBuild.result
