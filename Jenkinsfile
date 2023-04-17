@@ -129,6 +129,37 @@ pipeline {
         }
       }
 
+      // ---------------------------------
+      // k8s Integration tests!
+      // ---------------------------------
+      stage('Integration Tests - DEV') {
+        steps {
+          script {
+            try {
+              withKubeConfig([credentialsId: 'kubeconfig']) {
+                sh "bash integration-test.sh"
+              }
+            } catch (e) {
+              withKubeConfig([credentialsId: 'kubeconfig']) {
+                sh "kubectl -n default rollout undo deploy ${deploymentName}"
+              }
+              throw e
+            }
+          }
+        }
+      }
+
+      // ---------------------------------
+      // DAST Testing with ZAP!
+      // ---------------------------------
+      stage('OWASP ZAP - DAST') {
+        steps {
+          withKubeConfig([credentialsId: 'kubeconfig']) {
+            sh 'bash zap.sh'
+          }
+        }
+      }  
+
   }
   //---------------------------------
   //Move all the report output!
@@ -139,6 +170,7 @@ pipeline {
       jacoco execPattern: 'target/jacoco.exec'
       pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
       dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+      publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report'])
     }
 
     // success {
@@ -150,31 +182,6 @@ pipeline {
     // }
   }
 }
-
-      // stage('Integration Tests - DEV') {
-      //   steps {
-      //     script {
-      //       try {
-      //         withKubeConfig([credentialsId: 'kubeconfig']) {
-      //           sh "bash integration-test.sh"
-      //         }
-      //       } catch (e) {
-      //         withKubeConfig([credentialsId: 'kubeconfig']) {
-      //           sh "kubectl -n default rollout undo deploy ${deploymentName}"
-      //         }
-      //         throw e
-      //       }
-      //     }
-      //   }
-      // }  
-
-      // stage('OWASP ZAP - DAST') {
-      //   steps {
-      //     withKubeConfig([credentialsId: 'kubeconfig']) {
-      //       sh 'bash zap.sh'
-      //     }
-      //   }
-      // }
 
     //   stage('Prompte to PROD?') {
     //     steps {
