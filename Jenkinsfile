@@ -159,9 +159,9 @@ pipeline {
           }
         }
       } 
-      
+
       // ---------------------------------
-      // Send to Stage?
+      // Push to PROD?
       // ---------------------------------
       stage('Prompte to PROD?') {
         steps {
@@ -169,8 +169,7 @@ pipeline {
             input 'Do you want to Approve the Deployment to Production Environment/Namespace?'
           }
         }
-      }
-    } 
+      } 
   }
   //---------------------------------
   //Move all the report output!
