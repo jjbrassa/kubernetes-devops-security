@@ -91,6 +91,25 @@ pipeline {
       }
 
       // ---------------------------------
+      // k8s - Vuln scan
+      // ---------------------------------
+      stage('Vulnerability Scan - Kubernetes') {
+        steps {
+          parallel(
+            "OPA Scan": {
+              sh 'docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml'
+            },
+            "Kubesec Scan": {
+              sh "bash kubesec-scan.sh"
+            }
+            //"Trivy Scan": {
+            //  sh "bash trivy-k8s-scan.sh"
+            //}
+          )
+        }
+      }
+
+      // ---------------------------------
       // k8s Build - Dev env
       // ---------------------------------
       stage('K8S Deployment - DEV') {
@@ -130,23 +149,6 @@ pipeline {
 
     // }
   }
-}
-      // stage('Vulnerability Scan - Kubernetes') {
-      //   steps {
-      //     parallel(
-      //       "OPA Scan": {
-      //         sh 'docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml'
-      //       },
-      //       "Kubesec Scan": {
-      //         sh "bash kubesec-scan.sh"
-      //       }
-      //       //"Trivy Scan": {
-      //       //  sh "bash trivy-k8s-scan.sh"
-      //       //}
-      //     )
-      //   }
-      // }
-
       // stage('Integration Tests - DEV') {
       //   steps {
       //     script {
@@ -172,7 +174,7 @@ pipeline {
       //   }
       // }
 
-    //   stage('Prompte to PROD?') {
+    //   stage('Prompt to PROD?') {
     //     steps {
     //       timeout(time: 2, unit: 'DAYS') {
     //         input 'Do you want to Approve the Deployment to Production Environment/Namespace?'
